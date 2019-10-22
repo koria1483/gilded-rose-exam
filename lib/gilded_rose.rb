@@ -1,21 +1,22 @@
 require 'delegate'
 
 class GildedRose
-  
+  attr_accessor :items
+
   def initialize(items)
     @items = items
   end
 
   def update_quality
-    @items.each do |item|
-     ItemWrapper.wrap(item)
-    end 
+    items.each do |item|
+      ItemWrapper.wrap(item).update
+    end
   end
 
-end  #end of Class GildedRose
-    
+end
+
 class ItemWrapper < SimpleDelegator
-   def self.wrap(item)
+  def self.wrap(item)
     case item.name
     when "Aged Brie"
       AgedBrie.new(item)
@@ -28,30 +29,27 @@ class ItemWrapper < SimpleDelegator
     else
       new(item)
     end
-
-    update(item)
   end
 
-  def self.update(item)
-    return if item.name == "Sulfuras, Hand of Ragnaros"
-    age(item)
-    update_quality(item)
+  def update
+    return if name == "Sulfuras, Hand of Ragnaros"
+
+    age
+    update_quality
   end
 
-  def self.age(item)
-    item.sell_in -= 1
+  def age
+    self.sell_in -= 1
   end
-  
-  def self.update_quality(item)
-    item.quality += caluculate_quality_adjustment(item)
-  end  
 
-  def self.caluculate_quality_adjustment(item)
-    # This is for testing only
-    
+  def update_quality
+    self.quality += caluculate_quality_adjustment
+  end
+
+  def caluculate_quality_adjustment
     adjustment = 0
 
-    if item.sell_in < 0
+    if sell_in < 0
       adjustment -= 1
     else
       adjustment -= 1
@@ -59,13 +57,12 @@ class ItemWrapper < SimpleDelegator
 
     adjustment
   end
-   
-  def self.quality=(new_quality)
+
+  def quality=(new_quality)
     new_quality = 0 if new_quality < 0
     new_quality = 50 if new_quality > 50
     super(new_quality)
   end
-
 end
 
 class AgedBrie < ItemWrapper
@@ -79,9 +76,20 @@ class AgedBrie < ItemWrapper
   end
 end
 
-class SulfurasItem < ItemWrapper
+class BackstagePass < ItemWrapper
   def caluculate_quality_adjustment
-    #This item don't change anything
+    adjustment = 1
+    if sell_in < 11
+      adjustment += 1
+    end
+    if sell_in < 6
+      adjustment += 1
+    end
+    if sell_in < 0
+      adjustment -= quality
+    end
+
+    adjustment
   end
 end
 
@@ -93,5 +101,25 @@ class ConjuredItem < ItemWrapper
     end
 
     adjustment
+  end
+end
+
+class SulfurasItem < ItemWrapper
+  def caluculate_quality_adjustment
+    #This item don't change anything
+  end
+end
+
+class Item
+  attr_accessor :name, :sell_in, :quality
+
+  def initialize(name, sell_in, quality)
+    @name = name
+    @sell_in = sell_in
+    @quality = quality
+  end
+
+  def to_s()
+    "#{@name}, #{@sell_in}, #{@quality}"
   end
 end
