@@ -47,6 +47,8 @@ class ItemWrapper < SimpleDelegator
   end  
 
   def self.caluculate_quality_adjustment(item)
+    # This is for testing only
+    
     adjustment = 0
 
     if item.sell_in < 0
