@@ -43,10 +43,11 @@ class ItemWrapper < SimpleDelegator
   end
 
   def update_quality
-    self.quality += caluculate_quality_adjustment
+    retun self.quality = 0 if 
+    self.quality += calculate_quality_adjustment
   end
 
-  def caluculate_quality_adjustment
+  def calculate_quality_adjustment
     adjustment = 0
 
     if sell_in < 0
@@ -66,7 +67,7 @@ class ItemWrapper < SimpleDelegator
 end
 
 class AgedBrie < ItemWrapper
-  def caluculate_quality_adjustment
+  def calculate_quality_adjustment
     adjustment = 1
     if sell_in < 0
       adjustment += 1
@@ -77,7 +78,7 @@ class AgedBrie < ItemWrapper
 end
 
 class BackstagePass < ItemWrapper
-  def caluculate_quality_adjustment
+  def calculate_quality_adjustment
     adjustment = 1
     if sell_in < 11
       adjustment += 1
@@ -94,7 +95,7 @@ class BackstagePass < ItemWrapper
 end
 
 class ConjuredItem < ItemWrapper
-  def caluculate_quality_adjustment
+  def calculate_quality_adjustment
     adjustment = -2
     if sell_in < 0
       adjustment -= 2
@@ -105,7 +106,7 @@ class ConjuredItem < ItemWrapper
 end
 
 class SulfurasItem < ItemWrapper
-  def caluculate_quality_adjustment
+  def calculate_quality_adjustment
     #This item don't change anything
   end
 end
